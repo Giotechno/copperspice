@@ -1,7 +1,7 @@
 name: Build CopperSpice Windows 7 32-bit
 
 on:
-  workflow_dispatch: # Permet de lancer le build manuellement d'un clic
+  workflow_dispatch:
 
 jobs:
   build:
@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: Checkout du code source
-      uses: actions/checkout:v4
+      uses: actions/checkout@v4
       with:
         submodules: recursive
 
@@ -25,17 +25,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -G "Ninja" `
-          -DCMAKE_BUILD_TYPE=Release `
-          -DCMAKE_CXX_COMPILER=g++ `
-          -DCMAKE_C_COMPILER=gcc `
-          -DCMAKE_CXX_FLAGS="-m32 -march=i686 -mtune=generic" `
-          -DCMAKE_C_FLAGS="-m32 -march=i686 -mtune=generic" `
-          -DCMAKE_EXE_LINKER_FLAGS="-Wl,--large-address-aware" `
-          -DCS_BUILD_SHARED=ON `
-          -DCS_ENABLE_SSL=OFF `
-          -DCMAKE_INSTALL_PREFIX=../copperspice_win32 `
-          ..
+        cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_FLAGS="-m32 -march=i686 -mtune=generic" -DCMAKE_C_FLAGS="-m32 -march=i686 -mtune=generic" -DCMAKE_EXE_LINKER_FLAGS="-Wl,--large-address-aware" -DCS_BUILD_SHARED=ON -DCS_ENABLE_SSL=OFF -DCMAKE_INSTALL_PREFIX=../copperspice_win32 ..
 
     - name: Compilation
       run: |
