@@ -1,0 +1,54 @@
+name: Build CopperSpice Windows 7 32-bit
+
+on:
+  workflow_dispatch: # Permet de lancer le build manuellement d'un clic
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout du code source
+      uses: actions/checkout:v4
+      with:
+        submodules: recursive
+
+    - name: Configurer CMake et Ninja
+      uses: lukka/get-cmake@latest
+
+    - name: Installer GCC 13.1.0 (i686 32-bit)
+      run: |
+        choco install mingw --version=13.1.0 --arch=32 -y
+        echo "C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\bin" >> $GITHUB_PATH
+
+    - name: Configuration CMake
+      run: |
+        mkdir build
+        cd build
+        cmake -G "Ninja" `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DCMAKE_CXX_COMPILER=g++ `
+          -DCMAKE_C_COMPILER=gcc `
+          -DCMAKE_CXX_FLAGS="-m32 -march=i686 -mtune=generic" `
+          -DCMAKE_C_FLAGS="-m32 -march=i686 -mtune=generic" `
+          -DCMAKE_EXE_LINKER_FLAGS="-Wl,--large-address-aware" `
+          -DCS_BUILD_SHARED=ON `
+          -DCS_ENABLE_SSL=OFF `
+          -DCMAKE_INSTALL_PREFIX=../copperspice_win32 `
+          ..
+
+    - name: Compilation
+      run: |
+        cd build
+        ninja
+
+    - name: Installation
+      run: |
+        cd build
+        ninja install
+
+    - name: Téléverser l'archive des binaires
+      uses: actions/upload-artifact@v4
+      with:
+        name: copperspice-gcc13.1.0-win32
+        path: copperspice_win32/
